@@ -16,7 +16,7 @@ patterns = [{"label":"SPORT", "pattern":"basketball"},
 ruler.add_patterns(patterns)
 
 #doc = main_nlp('/src/df_extracted.csv')
-df_extracted = pd.read_csv('C:/Users/ohike/PycharmProjects/CBi-MRC-Analytics/src/df_extracted.csv')
+#df_extracted = pd.read_csv('C:/Users/ohike/PycharmProjects/CBi-MRC-Analytics/src/df_extracted.csv')
 doc = nlp(text)
 
 for ent in doc.ents:
