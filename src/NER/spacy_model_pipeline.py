@@ -33,7 +33,7 @@ disaster_management = ['Caution and advice', 'Injured People', 'Dead people', 'I
 
 
 nlp = spacy.load("en_core_web_lg")
-nlp.max_length = 1500000
+nlp.max_length = 1600000
 ruler = EntityRuler(nlp, overwrite_ents=True)
 
 patterns_crisis = list(nlp.tokenizer.pipe(crisis))
@@ -58,9 +58,15 @@ ruler.add_patterns(patterns_disaster_management)
 
 #doc = main_nlp('/src/df_extracted.csv')
 df_extracted = pd.read_csv('df_extracted.csv', engine='python', encoding='utf-8', error_bad_lines=False)
-df_extracted = df_extracted[:1000]
-df_extracted['Matches'] = df_extracted['text'].apply(get_entities)
+df_extracted['text'] = df_extracted['text'].map(str)
+#df_extracted['file_name'] = df_extracted['file_name'].str.replace(r'.txt$', '')
+df_extracted['text'] = df_extracted['text'].str.lower()
+df_extracted['text'] = df_extracted['text'].str.replace("\n","").replace("\t"," ").replace("\x0c"," ").replace(".",". ")
+df_extracted['text'] = df_extracted['text'].str.replace("\r"," ").replace(',',"").replace("\r\n"," ")
 
+#df_extracted = df_extracted[:100]
+df_extracted['Matches'] = df_extracted.text.apply(lambda x : get_entities(x))
+df_extracted.to_csv('df_extracted_cleaned.csv')
 
 #save a spaCy Model
 nlp.to_disk("disaster_management_ner")
