@@ -64,26 +64,18 @@ df_extracted['text'] = df_extracted['text'].str.replace("\r"," ").replace(',',""
 for i in range(len(df_extracted['text'])):
     file_name = df_extracted['file_name'][i]
     text = df_extracted['text'][i]
+
     d = []
     doc = nlp(text)
     matches= matcher(doc)
     for match_id, start, end in matches:
         string_ = nlp.vocab.strings[match_id]
-        span = doc[start:end]
-        d.append((string_, span.text))
-    keywords = "\n".join(f'{i[0]} {i[1]} ({j})' for i,j in Counter(d).items())
+        span = doc[start: end]
+        first_position = start / len(doc)
+        d.append((file_name, string_, span.text, first_position))
 
-    df = pd.read_csv(StringIO(keywords),names = ['Keywords_List'])
-    df1 = pd.DataFrame(df.Keywords_List.str.split(' ',1).tolist(),columns = ['Subject','Keyword'])
-    df2 = pd.DataFrame(df1.Keyword.str.split('(',1).tolist(),columns = ['Keyword', 'Count'])
-    df3 = pd.concat([df1['Subject'],df2['Keyword'], df2['Count']], axis =1)
-    df3['Count'] = df3['Count'].apply(lambda x: x.rstrip(")"))
-    df3.to_csv('src/NER/disaster_management_ner/ner_extract/df3.csv')
-
-
-#df_extracted = df_extracted[:100]
-#df_extracted['Matches'] = df_extracted.text.apply(lambda x : get_entities(x))
-#df_extracted.to_csv('df_extracted_cleaned.csv')
+df_documentConcepts = pd.DataFrame(d, columns=['file_name', 'concepts.facet', 'concepts.facet_instance', 'first_position'])
+df_documentConcepts.to_csv()
 
 #save a spaCy Model
 nlp.to_disk("disaster_management_ner")
